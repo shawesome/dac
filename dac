@@ -1,0 +1,80 @@
+#!/usr/bin/python
+import argparse
+import os
+import shutil
+
+def parseArgs():
+    parser = argparse.ArgumentParser(description='Copy a file from base/default into a user specified theme and commit the file.')
+    parser.add_argument('File', metavar='file', 
+                       help='the file in base/default which we want to copy to our theme.')
+    parser.add_argument('Package', metavar='package',
+                       help='the package to duplicate the template to.')
+    parser.add_argument('-t', metavar='theme', default="default",
+                       help='the theme to duplicate the template to (default: default).')
+
+    args = parser.parse_args()
+    return args
+
+# Commence the running!
+args = parseArgs()
+template = args.File
+package = args.Package
+theme = args.t
+
+src = os.path.abspath(template)
+dest = os.path.abspath(template)
+
+if 'base/default/' in dest:
+    dest = dest.replace('base/default', package + '/' + theme)
+    
+print src 
+print '=>'
+print dest
+
+destPath = dest.split('/');
+destFilename = destPath[len(destPath)-1]
+destPath = destPath[:len(destPath)-1] #Chop off the filename
+destPath = '/'.join(destPath)
+
+if not os.path.isdir(destPath):
+    os.makedirs(destPath)
+try:
+    shutil.copy2(src, dest)
+except IOError as e:
+    print e
+
+
+# Copy was successful, lets see if they want to commit it too.
+print """
+Copy successful, I want to:
+    
+    (1) Do no further action.
+    (2) Commit this file with the commit message 'Initial commit of %s'.
+    (3) Commit this file with another message.
+""" % destFilename
+
+while(True):
+    response = raw_input('Your choice: ')
+
+    if response == '1':
+        break
+    elif response == '2':
+        os.system('git add %s' % dest)
+        os.system('git commit %s -m "Initial commit of %s"' % (dest, destFilename))
+        break
+    elif response == '3':
+        while(True):
+            message = raw_input('Your commit message: ')
+            if message == "":
+                print "Don't leave it empty (-_-)"
+            else:
+                break
+        os.system('git add %s' % dest)
+        os.system('git commit %s -m "%s"' % (dest, message))
+        break
+
+    print "Unregonised command (O.o) Try again."
+
+
+
+

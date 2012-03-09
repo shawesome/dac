@@ -15,6 +15,18 @@ def parseArgs():
     args = parser.parse_args()
     return args
 
+# Get a filepath like catalog/product/list.phtml from the absolute path
+def getFilename(absolutePath):
+    delimiter = ''
+    if '/layout/' in absolutePath:
+        delimiter = '/layout/'
+    elif '/template/' in absolutePath:
+        delimiter = '/template/'
+        
+    filename = absolutePath.split(delimiter)
+    filename = filename[1]
+    return filename
+
 # Commence the running!
 args = parseArgs()
 template = args.File
@@ -32,7 +44,7 @@ print '=>'
 print dest
 
 destPath = dest.split('/');
-destFilename = destPath[len(destPath)-1]
+destFilename = getFilename(dest)
 destPath = destPath[:len(destPath)-1] #Chop off the filename
 destPath = '/'.join(destPath)
 

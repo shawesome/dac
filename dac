@@ -2,6 +2,7 @@
 import argparse
 import os
 import shutil
+import sys
 
 def parseArgs():
     parser = argparse.ArgumentParser(description='Copy a file from base/default into a user specified theme and commit the file.')
@@ -49,8 +50,37 @@ destPath = destPath[:len(destPath)-1] #Chop off the filename
 destPath = '/'.join(destPath)
 
 if not os.path.isdir(destPath):
+    # We should also make sure the package exists.. Maybe the user has made a typo.
+    packagePath = destPath.split('/')
+    packagePath = packagePath[0:packagePath.index(package)+1]
+    packagePath = '/'.join(packagePath)
+    response = ''
+    if not os.path.isdir(packagePath):
+        while True:
+            print "WARNING! The package %s doesn't seem to exist. Proceed? (Y/N) " % (package,)
+            response = raw_input('').lower()
+            if response in ['y', 'n']:
+                break;
+
+    if response == 'n':
+        print "Aborting."
+        sys.exit(-1);
+
     os.makedirs(destPath)
 try:
+    response = ''
+    if os.path.exists(dest):
+        while True:
+            print "WARNING! This file seems to already exist. Proceed? (Y/N) "
+            response = raw_input('').lower()
+            if response in ['y', 'n']:
+                break;
+
+
+    if response == 'n':
+        print "Aborting."
+        sys.exit(-1);
+
     shutil.copy2(src, dest)
 except IOError as e:
     print e

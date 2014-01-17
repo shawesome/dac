@@ -1,6 +1,10 @@
 # Duplicate and Commit
 
-Speed up your Magento theme development with this nifty python script
+Copy template files from one theme to another and commit them to git. 
+
+Usually used to copy template files from the base/default theme into yourpackage/default.
+
+Complies with http://magentotherightway.com/
 
 # Installation
 
